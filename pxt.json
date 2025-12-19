@@ -1,7 +1,8 @@
 {
     "name": "m5stack-unit-encoder",
     "version": "1.0.0",
-    "description": "",
+    "description": "MakeCode extension for M5Stack Unit Encoder - A rotary encoder with RGB LEDs and button",
+    "license": "MIT",
     "dependencies": {
         "core": "*"
     },
@@ -9,8 +10,14 @@
         "README.md",
         "main.ts"
     ],
+    "testFiles": [
+        "test.ts"
+    ],
     "public": true,
     "supportedTargets": [
-        "microbit"
-    ]
+        "microbit",
+        "arcade",
+        "maker"
+    ],
+    "preferredEditor": "tsprj"
 }
