@@ -1,0 +1,16 @@
+{
+    "name": "m5stack-unit-encoder",
+    "version": "1.0.0",
+    "description": "",
+    "dependencies": {
+        "core": "*"
+    },
+    "files": [
+        "README.md",
+        "main.ts"
+    ],
+    "public": true,
+    "supportedTargets": [
+        "microbit"
+    ]
+}
