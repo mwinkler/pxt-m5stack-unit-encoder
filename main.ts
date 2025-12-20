@@ -1,8 +1,7 @@
 /**
  * M5Stack Unit Encoder block
  */
-//% color=#0fbc11 icon="\uf021" block="M5 Encoder"
-//% groups=['Basic', 'LED', 'Advanced', 'Events']
+//% color=#0079B9 icon="\uf021" block="M5 Encoder"
 namespace m5encoder {
     const ENCODER_ADDR = 0x40;
     const MODE_REG = 0x00;
