@@ -1,16 +1,19 @@
 /**
  * M5Stack Unit Encoder block
  */
-//% color=#0fbc11 icon="\uf021" block="Unit Encoder"
-//% groups=['Basic', 'LED', 'Advanced']
-namespace unitEncoder {
+//% color=#0fbc11 icon="\uf021" block="M5 Encoder"
+//% groups=['Basic', 'LED', 'Advanced', 'Events']
+namespace m5encoder {
     const ENCODER_ADDR = 0x40;
     const MODE_REG = 0x00;
     const ENCODER_REG = 0x10;
     const BUTTON_REG = 0x20;
     const RGB_LED_REG = 0x30;
 
-    let initialized = false;
+    let lastButtonState = false;
+    let buttonPressHandlers: (() => void)[] = [];
+    let buttonReleaseHandlers: (() => void)[] = [];
+    let monitoringActive = false;
 
     /**
      * Work modes for the encoder
@@ -23,27 +26,44 @@ namespace unitEncoder {
     }
 
     /**
-     * Initialize the Unit Encoder
-     * @param addr I2C address, default is 0x40
+     * Start monitoring the button state (internal)
      */
-    //% blockId=unit_encoder_init
-    //% block="initialize Unit Encoder|at address %addr"
-    //% addr.defl=0x40
-    //% weight=100
-    //% group="Basic"
-    export function init(addr: number = ENCODER_ADDR): void {
-        if (!initialized) {
-            // Initialization handled by C++ begin function
-            initialized = true;
-        }
+    function startButtonMonitoring(): void {
+        if (monitoringActive) return;
+        monitoringActive = true;
+
+        control.inBackground(function () {
+            while (true) {
+                const currentButtonState = isButtonPressed();
+                
+                // Detect button press (transition from false to true)
+                if (currentButtonState && !lastButtonState) {
+                    // Button was pressed
+                    for (let handler of buttonPressHandlers) {
+                        handler();
+                    }
+                }
+                
+                // Detect button release (transition from true to false)
+                if (!currentButtonState && lastButtonState) {
+                    // Button was released
+                    for (let handler of buttonReleaseHandlers) {
+                        handler();
+                    }
+                }
+                
+                lastButtonState = currentButtonState;
+                basic.pause(50);
+            }
+        });
     }
 
     /**
      * Get the current encoder value
      * @return The encoder value
      */
-    //% blockId=unit_encoder_get_value
-    //% block="encoder value"
+    //% blockId=m5encoder_get_value
+    //% block="M5 encoder value"
     //% weight=90
     //% group="Basic"
     export function getEncoderValue(): number {
@@ -68,8 +88,8 @@ namespace unitEncoder {
      * Check if the encoder button is pressed
      * @return true if button is pressed, false otherwise
      */
-    //% blockId=unit_encoder_button_pressed
-    //% block="encoder button pressed"
+    //% blockId=m5encoder_button_pressed
+    //% block="M5 encoder button pressed"
     //% weight=80
     //% group="Basic"
     export function isButtonPressed(): boolean {
@@ -83,8 +103,8 @@ namespace unitEncoder {
      * @param index LED index (0 or 1)
      * @param color RGB color value (0x000000 to 0xFFFFFF)
      */
-    //% blockId=unit_encoder_set_led_color
-    //% block="set LED %index|to color %color"
+    //% blockId=m5encoder_set_led_color
+    //% block="set M5 encoder LED %index|to color %color"
     //% index.min=0 index.max=1
     //% color.shadow="colorNumberPicker"
     //% weight=70
@@ -107,8 +127,8 @@ namespace unitEncoder {
      * @param green Green value (0-255)
      * @param blue Blue value (0-255)
      */
-    //% blockId=unit_encoder_set_led_rgb
-    //% block="set LED %index|red %red|green %green|blue %blue"
+    //% blockId=m5encoder_set_led_rgb
+    //% block="set M5 encoder LED %index|red %red|green %green|blue %blue"
     //% index.min=0 index.max=1
     //% red.min=0 red.max=255
     //% green.min=0 green.max=255
@@ -124,8 +144,8 @@ namespace unitEncoder {
      * Turn off the LED
      * @param index LED index (0 or 1)
      */
-    //% blockId=unit_encoder_led_off
-    //% block="turn off LED %index"
+    //% blockId=m5encoder_led_off
+    //% block="turn off M5 encoder LED %index"
     //% index.min=0 index.max=1
     //% weight=50
     //% group="LED"
@@ -137,8 +157,8 @@ namespace unitEncoder {
      * Set the work mode of the encoder
      * @param mode Work mode
      */
-    //% blockId=unit_encoder_set_mode
-    //% block="set encoder mode to %mode"
+    //% blockId=m5encoder_set_mode
+    //% block="set M5 encoder mode to %mode"
     //% weight=40
     //% group="Advanced"
     export function setWorkMode(mode: WorkMode): void {
@@ -151,8 +171,8 @@ namespace unitEncoder {
     /**
      * Reset encoder value to zero
      */
-    //% blockId=unit_encoder_reset
-    //% block="reset encoder value"
+    //% blockId=m5encoder_reset
+    //% block="reset M5 encoder value"
     //% weight=30
     //% group="Advanced"
     export function reset(): void {
@@ -161,5 +181,37 @@ namespace unitEncoder {
         buf[1] = 0;
         pins.i2cWriteNumber(ENCODER_ADDR, ENCODER_REG, NumberFormat.UInt8LE, false);
         pins.i2cWriteBuffer(ENCODER_ADDR, buf, false);
+    }
+
+    /**
+     * Do something when button is pressed
+     * @param handler Function to run when button is pressed
+     */
+    //% blockId=m5encoder_on_button_pressed
+    //% block="on M5 encoder button pressed"
+    //% weight=90
+    //% group="Events"
+    export function onButtonPressed(handler: () => void): void {
+        buttonPressHandlers.push(handler);
+        // Ensure monitoring is active
+        if (!monitoringActive) {
+            startButtonMonitoring();
+        }
+    }
+
+    /**
+     * Do something when button is released
+     * @param handler Function to run when button is released
+     */
+    //% blockId=m5encoder_on_button_released
+    //% block="on M5 encoder button released"
+    //% weight=80
+    //% group="Events"
+    export function onButtonReleased(handler: () => void): void {
+        buttonReleaseHandlers.push(handler);
+        // Ensure monitoring is active
+        if (!monitoringActive) {
+            startButtonMonitoring();
+        }
     }
 }

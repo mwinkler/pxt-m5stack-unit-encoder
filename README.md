@@ -39,18 +39,15 @@ The Unit Encoder is an I2C device that connects via Grove connector. It features
 ## Example
 
 ```blocks
-// Initialize the encoder
-unitEncoder.init()
-
 // Set LED 0 to red
-unitEncoder.setLEDRGB(0, 255, 0, 0)
+m5encoder.setLEDRGB(0, 255, 0, 0)
 
 // Read encoder value
 basic.forever(function () {
-    if (unitEncoder.isButtonPressed()) {
-        unitEncoder.reset()
+    if (m5encoder.isButtonPressed()) {
+        m5encoder.reset()
     }
-    basic.showNumber(unitEncoder.getEncoderValue())
+    basic.showNumber(m5encoder.getEncoderValue())
 })
 ```
 
@@ -61,16 +58,10 @@ This repository can be added as an **extension** in MakeCode.
 * open [MakeCode](https://makecode.microbit.org/)
 * click on **New Project**
 * click on **Extensions** under the gearwheel menu
-* search for **https://github.com/YOUR_USERNAME/pxt-m5stack-unit-encoder** and import
+* search for **https://github.com/mwinkler/pxt-m5stack-unit-encoder** and import
 
 ## License
 
 MIT
-
-## Supported targets
-
-* for PXT/microbit
-* for PXT/arcade  
-* for PXT/maker
 
 <script src="https://makecode.com/gh-pages-embed.js"></script><script>makeCodeRender("{{ site.makecode.home_url }}", "{{ site.github.owner_name }}/{{ site.github.repository_name }}");</script>
