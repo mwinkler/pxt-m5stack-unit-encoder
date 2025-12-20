@@ -62,7 +62,7 @@ namespace m5encoder {
      * @return The encoder value
      */
     //% blockId=m5encoder_get_value
-    //% block="M5 encoder value"
+    //% block="encoder value"
     //% weight=90
     //% group="Basic"
     export function getEncoderValue(): number {
@@ -88,7 +88,7 @@ namespace m5encoder {
      * @return true if button is pressed, false otherwise
      */
     //% blockId=m5encoder_button_pressed
-    //% block="M5 encoder button pressed"
+    //% block="encoder button pressed"
     //% weight=80
     //% group="Basic"
     export function isButtonPressed(): boolean {
@@ -103,7 +103,7 @@ namespace m5encoder {
      * @param color RGB color value (0x000000 to 0xFFFFFF)
      */
     //% blockId=m5encoder_set_led_color
-    //% block="set M5 encoder LED %index|to color %color"
+    //% block="set encoder LED %index|to color %color"
     //% index.min=0 index.max=1
     //% color.shadow="colorNumberPicker"
     //% weight=70
@@ -127,7 +127,7 @@ namespace m5encoder {
      * @param blue Blue value (0-255)
      */
     //% blockId=m5encoder_set_led_rgb
-    //% block="set M5 encoder LED %index|red %red|green %green|blue %blue"
+    //% block="set encoder LED %index|red %red|green %green|blue %blue"
     //% index.min=0 index.max=1
     //% red.min=0 red.max=255
     //% green.min=0 green.max=255
@@ -144,7 +144,7 @@ namespace m5encoder {
      * @param index LED index (0 or 1)
      */
     //% blockId=m5encoder_led_off
-    //% block="turn off M5 encoder LED %index"
+    //% block="turn off encoder LED %index"
     //% index.min=0 index.max=1
     //% weight=50
     //% group="LED"
@@ -157,7 +157,7 @@ namespace m5encoder {
      * @param mode Work mode
      */
     //% blockId=m5encoder_set_mode
-    //% block="set M5 encoder mode to %mode"
+    //% block="set encoder mode to %mode"
     //% weight=40
     //% group="Advanced"
     export function setWorkMode(mode: WorkMode): void {
@@ -171,7 +171,7 @@ namespace m5encoder {
      * Reset encoder value to zero
      */
     //% blockId=m5encoder_reset
-    //% block="reset M5 encoder value"
+    //% block="reset encoder value"
     //% weight=30
     //% group="Advanced"
     export function reset(): void {
@@ -187,7 +187,7 @@ namespace m5encoder {
      * @param handler Function to run when button is pressed
      */
     //% blockId=m5encoder_on_button_pressed
-    //% block="on M5 encoder button pressed"
+    //% block="on encoder button pressed"
     //% weight=90
     //% group="Events"
     export function onButtonPressed(handler: () => void): void {
@@ -203,7 +203,7 @@ namespace m5encoder {
      * @param handler Function to run when button is released
      */
     //% blockId=m5encoder_on_button_released
-    //% block="on M5 encoder button released"
+    //% block="on encoder button released"
     //% weight=80
     //% group="Events"
     export function onButtonReleased(handler: () => void): void {
