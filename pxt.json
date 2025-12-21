@@ -1,7 +1,7 @@
 {
     "name": "m5stack-unit-encoder",
     "version": "1.0.0",
-    "description": "M5Stack Rotary Encoder with RGB LEDs and button",
+    "description": "M5Stack Rotary Encoder Unit (STM32F030)",
     "license": "MIT",
     "dependencies": {
         "core": "*"
