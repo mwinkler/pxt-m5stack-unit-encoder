@@ -1,4 +1,4 @@
-# M5Stack Unit Encoder Extension
+# M5Stack Unit Encoder MakeCode Extension
 
 This is a MakeCode extension for the M5Stack Unit Encoder - a rotary encoder with RGB LEDs and button functionality.
 
