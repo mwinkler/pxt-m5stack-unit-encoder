@@ -159,6 +159,7 @@ namespace m5encoder {
     //% blockId=m5encoder_set_mode
     //% block="set encoder mode to %mode"
     //% weight=40
+    //% advanced=true
     //% group="Advanced"
     export function setWorkMode(mode: WorkMode): void {
         pins.i2cWriteNumber(ENCODER_ADDR, MODE_REG, NumberFormat.UInt8LE, false);
@@ -173,6 +174,7 @@ namespace m5encoder {
     //% blockId=m5encoder_reset
     //% block="reset encoder value"
     //% weight=30
+    //% advanced=true
     //% group="Advanced"
     export function reset(): void {
         const buf = pins.createBuffer(2);

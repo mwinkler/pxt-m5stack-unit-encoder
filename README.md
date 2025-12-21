@@ -6,7 +6,8 @@ This is a MakeCode extension for the M5Stack Unit Encoder - a rotary encoder wit
 
 - Read encoder rotation values
 - Check button press status
-- Control RGB LEDs
+- Event callbacks for press/release
+- Control RGB LEDs (hex or RGB)
 - Multiple work modes (Pulse mode, AB phase mode)
 
 ## Hardware
@@ -21,7 +22,6 @@ The Unit Encoder is an I2C device that connects via Grove connector. It features
 
 ### Basic Operations
 
-- **initialize Unit Encoder** - Initialize the encoder (call once at start)
 - **encoder value** - Get the current encoder rotation value
 - **encoder button pressed** - Check if the button is pressed
 
@@ -33,21 +33,35 @@ The Unit Encoder is an I2C device that connects via Grove connector. It features
 
 ### Advanced
 
-- **set encoder mode** - Change between pulse mode and AB phase mode
-- **reset encoder value** - Reset the encoder value to zero
+- **set encoder mode** - Change between pulse mode and AB phase mode (advanced)
+- **reset encoder value** - Reset the encoder value to zero (advanced)
+
+### Events
+
+- **on encoder button pressed** - Run code when the button is pressed
+- **on encoder button released** - Run code when the button is released
 
 ## Example
 
 ```blocks
-// Set LED 0 to red
+// Set LED 0 to red and LED 1 to blue
 m5encoder.setLEDRGB(0, 255, 0, 0)
+m5encoder.setLEDColor(1, 0x0000ff)
 
-// Read encoder value
+// React to button events
+m5encoder.onButtonPressed(function () {
+    m5encoder.reset()
+    m5encoder.setLEDRGB(0, 0, 255, 0)
+})
+
+m5encoder.onButtonReleased(function () {
+    m5encoder.setLEDRGB(0, 255, 0, 0)
+})
+
+// Show encoder value continuously
 basic.forever(function () {
-    if (m5encoder.isButtonPressed()) {
-        m5encoder.reset()
-    }
     basic.showNumber(m5encoder.getEncoderValue())
+    basic.pause(100)
 })
 ```
 
