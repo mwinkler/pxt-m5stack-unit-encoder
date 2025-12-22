@@ -8,6 +8,7 @@ This is a MakeCode extension for the M5Stack Unit Encoder - a rotary encoder wit
 - Check button press status
 - Event callbacks for press/release
 - Control RGB LEDs (hex or RGB)
+- LED selection via enum: All, Left, Right
 - Multiple work modes (Pulse mode, AB phase mode)
 
 ## Hardware
@@ -27,9 +28,17 @@ The Unit Encoder is an I2C device that connects via Grove connector. It features
 
 ### LED Control
 
-- **set LED to color** - Set LED color using hex value
-- **set LED RGB** - Set LED color using RGB values (0-255)
-- **turn off LED** - Turn off the specified LED
+- **set LED to color** - Set LED color using hex value (select All/Left/Right)
+- **set LED RGB** - Set LED color using RGB values (0-255) (select All/Left/Right)
+- **turn off LED** - Turn off the selected LEDs (All/Left/Right)
+
+#### LED Selection Enum
+
+Use the `Led` enum to select which LED(s) to address:
+
+- `Led.All` (0): addresses both LEDs with a single command
+- `Led.Left` (1): left LED
+- `Led.Right` (2): right LED
 
 ### Advanced
 
@@ -44,18 +53,20 @@ The Unit Encoder is an I2C device that connects via Grove connector. It features
 ## Example
 
 ```blocks
-// Set LED 0 to red and LED 1 to blue
-m5encoder.setLEDRGB(0, 255, 0, 0)
-m5encoder.setLEDColor(1, 0x0000ff)
+// Set Left LED to red and Right LED to blue
+m5encoder.setLEDRGB(m5encoder.Led.Left, 255, 0, 0)
+m5encoder.setLEDColor(m5encoder.Led.Right, 0x0000ff)
 
 // React to button events
 m5encoder.onButtonPressed(function () {
     m5encoder.reset()
-    m5encoder.setLEDRGB(0, 0, 255, 0)
+    // Set both LEDs to green using All
+    m5encoder.setLEDRGB(m5encoder.Led.All, 0, 255, 0)
 })
 
 m5encoder.onButtonReleased(function () {
-    m5encoder.setLEDRGB(0, 255, 0, 0)
+    // Set both LEDs to red using All
+    m5encoder.setLEDRGB(m5encoder.Led.All, 255, 0, 0)
 })
 
 // Show encoder value continuously

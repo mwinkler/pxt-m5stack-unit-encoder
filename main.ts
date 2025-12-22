@@ -8,6 +8,7 @@ namespace m5encoder {
     const ENCODER_REG = 0x10;
     const BUTTON_REG = 0x20;
     const RGB_LED_REG = 0x30;
+    const RESET_REG = 0x40;
 
     let lastButtonState = false;
     let buttonPressHandlers: (() => void)[] = [];
@@ -22,6 +23,18 @@ namespace m5encoder {
         PulseMode = 0x00,
         //% block="AB phase mode"
         ABPhaseMode = 0x01
+    }
+
+    /**
+     * LED selection
+     */
+    export enum Led {
+        //% block="all"
+        All = 0,
+        //% block="left"
+        Left = 1,
+        //% block="right"
+        Right = 2
     }
 
     /**
@@ -69,10 +82,6 @@ namespace m5encoder {
     //% weight=90
     //% group="Basic"
     export function getEncoderValue(): number {
-        const buf = pins.createBuffer(2);
-        pins.i2cReadBuffer(ENCODER_ADDR, 2, false);
-        const data = pins.i2cReadBuffer(ENCODER_ADDR, 2, false);
-        
         // Read from ENCODER_REG
         pins.i2cWriteNumber(ENCODER_ADDR, ENCODER_REG, NumberFormat.UInt8LE, false);
         const result = pins.i2cReadBuffer(ENCODER_ADDR, 2, false);
@@ -102,56 +111,56 @@ namespace m5encoder {
 
     /**
      * Set the LED color
-     * @param index LED index (0 or 1)
+     * @param index LED selection (all, left, right)
      * @param color RGB color value (0x000000 to 0xFFFFFF)
      */
     //% blockId=m5encoder_set_led_color
     //% block="set encoder LED %index|to color %color"
-    //% index.min=0 index.max=1
+    //% index.defl=LEDIndex.All
     //% color.shadow="colorNumberPicker"
     //% weight=70
     //% group="LED"
-    export function setLEDColor(index: number, color: number): void {
-        const buf = pins.createBuffer(4);
-        buf[0] = index;
-        buf[1] = (color >> 16) & 0xFF; // R
-        buf[2] = (color >> 8) & 0xFF;  // G
-        buf[3] = color & 0xFF;          // B
-        
-        pins.i2cWriteNumber(ENCODER_ADDR, RGB_LED_REG, NumberFormat.UInt8LE, false);
+    export function setLEDColor(index: Led, color: number): void {
+        const buf = pins.createBuffer(5);
+        buf[0] = RGB_LED_REG;
+        buf[1] = index;
+        buf[2] = (color >> 16) & 0xFF; // R
+        buf[3] = (color >> 8) & 0xFF;  // G
+        buf[4] = color & 0xFF;         // B
+
         pins.i2cWriteBuffer(ENCODER_ADDR, buf, false);
     }
 
     /**
      * Set LED color using RGB values
-     * @param index LED index (0 or 1)
+     * @param index LED selection (all, left, right)
      * @param red Red value (0-255)
      * @param green Green value (0-255)
      * @param blue Blue value (0-255)
      */
     //% blockId=m5encoder_set_led_rgb
     //% block="set encoder LED %index|red %red|green %green|blue %blue"
-    //% index.min=0 index.max=1
+    //% index.defl=LEDIndex.All
     //% red.min=0 red.max=255
     //% green.min=0 green.max=255
     //% blue.min=0 blue.max=255
     //% weight=60
     //% group="LED"
-    export function setLEDRGB(index: number, red: number, green: number, blue: number): void {
+    export function setLEDRGB(index: Led, red: number, green: number, blue: number): void {
         const color = (red << 16) | (green << 8) | blue;
         setLEDColor(index, color);
     }
 
     /**
      * Turn off the LED
-     * @param index LED index (0 or 1)
+     * @param index LED selection (all, left, right)
      */
     //% blockId=m5encoder_led_off
     //% block="turn off encoder LED %index"
-    //% index.min=0 index.max=1
+    //% index.defl=LEDIndex.All
     //% weight=50
     //% group="LED"
-    export function turnOffLED(index: number): void {
+    export function turnOffLED(index: Led): void {
         setLEDColor(index, 0x000000);
     }
 
@@ -180,11 +189,13 @@ namespace m5encoder {
     //% advanced=true
     //% group="Advanced"
     export function reset(): void {
-        const buf = pins.createBuffer(2);
-        buf[0] = 0;
+        const buf = pins.createBuffer(3);
+        buf[0] = ENCODER_REG;
         buf[1] = 0;
-        pins.i2cWriteNumber(ENCODER_ADDR, ENCODER_REG, NumberFormat.UInt8LE, false);
+        buf[2] = 0;
         pins.i2cWriteBuffer(ENCODER_ADDR, buf, false);
+        // pins.i2cWriteNumber(ENCODER_ADDR, RESET_REG, NumberFormat.UInt8LE, false);
+        // pins.i2cWriteNumber(ENCODER_ADDR, 1, NumberFormat.UInt8LE, false);
     }
 
     /**
