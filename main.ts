@@ -32,6 +32,9 @@ namespace m5encoder {
         monitoringActive = true;
 
         control.inBackground(function () {
+            // Initialize with current state to avoid firing events on startup
+            lastButtonState = isButtonPressed();
+            
             while (true) {
                 const currentButtonState = isButtonPressed();
                 
@@ -94,7 +97,7 @@ namespace m5encoder {
     export function isButtonPressed(): boolean {
         pins.i2cWriteNumber(ENCODER_ADDR, BUTTON_REG, NumberFormat.UInt8LE, false);
         const data = pins.i2cReadBuffer(ENCODER_ADDR, 1, false);
-        return data[0] == 1;
+        return data[0] == 0;
     }
 
     /**
