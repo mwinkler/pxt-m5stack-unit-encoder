@@ -8,7 +8,6 @@ namespace m5encoder {
     const ENCODER_REG = 0x10;
     const BUTTON_REG = 0x20;
     const RGB_LED_REG = 0x30;
-    const RESET_REG = 0x40;
 
     let lastButtonState = false;
     let buttonPressHandlers: (() => void)[] = [];
@@ -84,15 +83,7 @@ namespace m5encoder {
     export function getEncoderValue(): number {
         // Read from ENCODER_REG
         pins.i2cWriteNumber(ENCODER_ADDR, ENCODER_REG, NumberFormat.UInt8LE, false);
-        const result = pins.i2cReadBuffer(ENCODER_ADDR, 2, false);
-        
-        // Convert to signed 16-bit integer
-        const value = result[0] | (result[1] << 8);
-        // Handle signed conversion
-        if (value > 32767) {
-            return value - 65536;
-        }
-        return value;
+        return pins.i2cReadNumber(ENCODER_ADDR, NumberFormat.Int16LE, false)
     }
 
     /**
@@ -178,24 +169,6 @@ namespace m5encoder {
         const buf = pins.createBuffer(1);
         buf[0] = mode;
         pins.i2cWriteBuffer(ENCODER_ADDR, buf, false);
-    }
-
-    /**
-     * Reset encoder value to zero
-     */
-    //% blockId=m5encoder_reset
-    //% block="reset encoder value"
-    //% weight=30
-    //% advanced=true
-    //% group="Advanced"
-    export function reset(): void {
-        const buf = pins.createBuffer(3);
-        buf[0] = ENCODER_REG;
-        buf[1] = 0;
-        buf[2] = 0;
-        pins.i2cWriteBuffer(ENCODER_ADDR, buf, false);
-        // pins.i2cWriteNumber(ENCODER_ADDR, RESET_REG, NumberFormat.UInt8LE, false);
-        // pins.i2cWriteNumber(ENCODER_ADDR, 1, NumberFormat.UInt8LE, false);
     }
 
     /**
