@@ -79,7 +79,7 @@ namespace m5encoder {
     //% blockId=m5encoder_get_value
     //% block="encoder value"
     //% weight=90
-    //% group="Basic"
+    //% group="Encoder"
     export function getEncoderValue(): number {
         // Read from ENCODER_REG
         pins.i2cWriteNumber(ENCODER_ADDR, ENCODER_REG, NumberFormat.UInt8LE, false);
@@ -93,7 +93,7 @@ namespace m5encoder {
     //% blockId=m5encoder_button_pressed
     //% block="encoder button pressed"
     //% weight=80
-    //% group="Basic"
+    //% group="Button"
     export function isButtonPressed(): boolean {
         pins.i2cWriteNumber(ENCODER_ADDR, BUTTON_REG, NumberFormat.UInt8LE, false);
         const data = pins.i2cReadBuffer(ENCODER_ADDR, 1, false);
@@ -180,7 +180,7 @@ namespace m5encoder {
     //% blockId=m5encoder_on_button_pressed
     //% block="on encoder button pressed"
     //% weight=90
-    //% group="Events"
+    //% group="Button"
     export function onButtonPressed(handler: () => void): void {
         buttonPressHandlers.push(handler);
         // Ensure monitoring is active
@@ -196,7 +196,7 @@ namespace m5encoder {
     //% blockId=m5encoder_on_button_released
     //% block="on encoder button released"
     //% weight=80
-    //% group="Events"
+    //% group="Button"
     export function onButtonReleased(handler: () => void): void {
         buttonReleaseHandlers.push(handler);
         // Ensure monitoring is active
