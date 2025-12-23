@@ -136,8 +136,11 @@ namespace m5encoder {
     //% green.min=0 green.max=255
     //% blue.min=0 blue.max=255
     //% weight=60
-    //% group="LED"
+    //% advanced=true
     export function setLEDRGB(index: Led, red: number, green: number, blue: number): void {
+        red = Math.max(0, Math.min(255, red));
+        green = Math.max(0, Math.min(255, green));
+        blue = Math.max(0, Math.min(255, blue));
         const color = (red << 16) | (green << 8) | blue;
         setLEDColor(index, color);
     }
@@ -163,7 +166,6 @@ namespace m5encoder {
     //% block="set encoder mode to %mode"
     //% weight=40
     //% advanced=true
-    //% group="Advanced"
     export function setWorkMode(mode: WorkMode): void {
         pins.i2cWriteNumber(ENCODER_ADDR, MODE_REG, NumberFormat.UInt8LE, false);
         const buf = pins.createBuffer(1);
