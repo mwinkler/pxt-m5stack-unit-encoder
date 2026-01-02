@@ -6,7 +6,8 @@ This is a MakeCode extension for the M5Stack Unit Encoder - a rotary encoder wit
 
 - Read encoder rotation values
 - Check button press status
-- Event callbacks for press/release
+- Event callbacks for button press/release with state parameter
+- Event callbacks for encoder value changes with value and delta parameters
 - Control RGB LEDs (hex or RGB)
 - LED selection via enum: All, Left, Right
 - Multiple work modes (Pulse mode, AB phase mode)
@@ -18,6 +19,11 @@ The Unit Encoder is an I2C device that connects via Grove connector. It features
 - Built-in button
 - 2 RGB LEDs
 - I2C address: 0x40 (default)
+
+### References
+
+- [M5Stack Unit Encoder documentation](https://docs.m5stack.com/en/unit/UNIT-Scroll)
+- [M5Unit-Scroll implementation reference](https://github.com/m5stack/M5Unit-Scroll)
 
 ## Blocks
 
@@ -43,12 +49,11 @@ Use the `Led` enum to select which LED(s) to address:
 ### Advanced
 
 - **set encoder mode** - Change between pulse mode and AB phase mode (advanced)
-- **reset encoder value** - Reset the encoder value to zero (advanced)
 
 ### Events
 
-- **on encoder button pressed** - Run code when the button is pressed
-- **on encoder button released** - Run code when the button is released
+- **on encoder button event** - Run code when button state changes (provides `pressed` parameter: true when pressed, false when released)
+- **on encoder value changed** - Run code when encoder value changes (provides `value` and `delta` parameters)
 
 ## Example
 
@@ -57,16 +62,21 @@ Use the `Led` enum to select which LED(s) to address:
 m5encoder.setLEDRGB(m5encoder.Led.Left, 255, 0, 0)
 m5encoder.setLEDColor(m5encoder.Led.Right, 0x0000ff)
 
-// React to button events
-m5encoder.onButtonPressed(function () {
-    m5encoder.reset()
-    // Set both LEDs to green using All
-    m5encoder.setLEDRGB(m5encoder.Led.All, 0, 255, 0)
+// React to button events - pressed parameter indicates state
+m5encoder.onButtonEvent(function (pressed) {
+    if (pressed) {
+        // Button was pressed - set LEDs to green
+        m5encoder.setLEDRGB(m5encoder.Led.All, 0, 255, 0)
+    } else {
+        // Button was released - set LEDs to red
+        m5encoder.setLEDRGB(m5encoder.Led.All, 255, 0, 0)
+    }
 })
 
-m5encoder.onButtonReleased(function () {
-    // Set both LEDs to red using All
-    m5encoder.setLEDRGB(m5encoder.Led.All, 255, 0, 0)
+// React to encoder value changes
+m5encoder.onEncoderChanged(function (value, delta) {
+    basic.showNumber(value)
+    // delta shows the change (+1 for clockwise, -1 for counter-clockwise)
 })
 
 // Show encoder value continuously

@@ -10,8 +10,11 @@ namespace m5encoder {
     const RGB_LED_REG = 0x30;
 
     let lastButtonState = false;
-    let buttonPressHandlers: (() => void)[] = [];
-    let buttonReleaseHandlers: (() => void)[] = [];
+    let buttonEventHandlers: ((pressed: boolean) => void)[] = [];
+    
+    let lastEncoderValue = 0;
+    let encoderChangeHandlers: ((value: number, delta: number) => void)[] = [];
+    
     let monitoringActive = false;
 
     /**
@@ -37,36 +40,51 @@ namespace m5encoder {
     }
 
     /**
-     * Start monitoring the button state (internal)
+     * Start monitoring the button and encoder (internal)
      */
-    function startButtonMonitoring(): void {
+    function startMonitoring(): void {
         if (monitoringActive) return;
         monitoringActive = true;
 
         control.inBackground(function () {
             // Initialize with current state to avoid firing events on startup
             lastButtonState = isButtonPressed();
+            lastEncoderValue = getEncoderValue();
             
             while (true) {
+                // Monitor button state
                 const currentButtonState = isButtonPressed();
                 
                 // Detect button press (transition from false to true)
                 if (currentButtonState && !lastButtonState) {
                     // Button was pressed
-                    for (let handler of buttonPressHandlers) {
-                        handler();
+                    for (let handler of buttonEventHandlers) {
+                        handler(true);
                     }
                 }
                 
                 // Detect button release (transition from true to false)
                 if (!currentButtonState && lastButtonState) {
                     // Button was released
-                    for (let handler of buttonReleaseHandlers) {
-                        handler();
+                    for (let handler of buttonEventHandlers) {
+                        handler(false);
                     }
                 }
                 
                 lastButtonState = currentButtonState;
+                
+                // Monitor encoder value
+                const currentEncoderValue = getEncoderValue();
+                
+                // Detect encoder value change
+                if (currentEncoderValue !== lastEncoderValue) {
+                    const delta = currentEncoderValue - lastEncoderValue;
+                    for (let handler of encoderChangeHandlers) {
+                        handler(currentEncoderValue, delta);
+                    }
+                    lastEncoderValue = currentEncoderValue;
+                }
+                
                 basic.pause(50);
             }
         });
@@ -174,34 +192,36 @@ namespace m5encoder {
     }
 
     /**
-     * Do something when button is pressed
-     * @param handler Function to run when button is pressed
+     * Do something when button is pressed or released
+     * @param handler Function to run when the button event occurs
      */
-    //% blockId=m5encoder_on_button_pressed
-    //% block="on encoder button pressed"
+    //% blockId=m5encoder_on_button_event
+    //% block="on encoder button event"
+    //% draggableParameters="reporter"
     //% weight=90
     //% group="Button"
-    export function onButtonPressed(handler: () => void): void {
-        buttonPressHandlers.push(handler);
+    export function onButtonEvent(handler: (pressed: boolean) => void): void {
+        buttonEventHandlers.push(handler);
         // Ensure monitoring is active
         if (!monitoringActive) {
-            startButtonMonitoring();
+            startMonitoring();
         }
     }
 
     /**
-     * Do something when button is released
-     * @param handler Function to run when button is released
+     * Do something when encoder value changes
+     * @param handler Function to run when the encoder value changes
      */
-    //% blockId=m5encoder_on_button_released
-    //% block="on encoder button released"
-    //% weight=80
-    //% group="Button"
-    export function onButtonReleased(handler: () => void): void {
-        buttonReleaseHandlers.push(handler);
+    //% blockId=m5encoder_on_value_changed
+    //% block="on encoder value changed"
+    //% draggableParameters="reporter"
+    //% weight=95
+    //% group="Encoder"
+    export function onEncoderChanged(handler: (value: number, delta: number) => void): void {
+        encoderChangeHandlers.push(handler);
         // Ensure monitoring is active
         if (!monitoringActive) {
-            startButtonMonitoring();
+            startMonitoring();
         }
     }
 }
