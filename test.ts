@@ -7,6 +7,10 @@ m5encoder.onButtonEvent(function (pressed) {
 })
 m5encoder.onEncoderChanged(function (value, delta) {
     serial.writeLine("v: " + value + " d: " + delta)
+    if (delta > 0) {
+        m5encoder.setLEDRGB(m5encoder.Led.All, 0, 0, value)
+    } else {
+        m5encoder.setLEDRGB(m5encoder.Led.All, 0, value, 0)
+    }
 })
 m5encoder.turnOffLED(m5encoder.Led.All)
-m5encoder.setWorkMode(m5encoder.WorkMode.ABPhaseMode)

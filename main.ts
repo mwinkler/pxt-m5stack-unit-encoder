@@ -18,16 +18,6 @@ namespace m5encoder {
     let monitoringActive = false;
 
     /**
-     * Work modes for the encoder
-     */
-    export enum WorkMode {
-        //% block="pulse mode"
-        PulseMode = 0x00,
-        //% block="AB phase mode"
-        ABPhaseMode = 0x01
-    }
-
-    /**
      * LED selection
      */
     export enum Led {
@@ -174,21 +164,6 @@ namespace m5encoder {
     //% group="LED"
     export function turnOffLED(index: Led): void {
         setLEDColor(index, 0x000000);
-    }
-
-    /**
-     * Set the work mode of the encoder
-     * @param mode Work mode
-     */
-    //% blockId=m5encoder_set_mode
-    //% block="set encoder mode to %mode"
-    //% weight=40
-    //% advanced=true
-    export function setWorkMode(mode: WorkMode): void {
-        pins.i2cWriteNumber(ENCODER_ADDR, MODE_REG, NumberFormat.UInt8LE, false);
-        const buf = pins.createBuffer(1);
-        buf[0] = mode;
-        pins.i2cWriteBuffer(ENCODER_ADDR, buf, false);
     }
 
     /**
